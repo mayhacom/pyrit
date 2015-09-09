@@ -946,12 +946,13 @@ class Pyrit_CLI(object):
                         writer.write(cracker.solution)
                 break
         else:
-            errmsg = "\nPassword was not found."
-            if len(auths) > 1 and all_handshakes is False:
-                errmsg += " Retry the attack with '--all-handshakes'.\n"
-            else:
-                errmsg += "\n"
-            raise PyritRuntimeError(errmsg)
+            self.tell("\nPassword was not found.\n")
+            #errmsg = "\nPassword was not found."
+            #if len(auths) > 1 and all_handshakes is False:
+            #    errmsg += " Retry the attack with '--all-handshakes'.\n"
+            #else:
+            #    errmsg += "\n"
+            #raise PyritRuntimeError(errmsg)
     attack_passthrough.cli_options = (('-i', '-r'), ('-e', '-b', '-o', \
                                                      '--all-handshakes'))
 
@@ -1011,12 +1012,13 @@ class Pyrit_CLI(object):
                         writer.write(cracker.solution)
                 break
         else:
-            errmsg = "\nPassword was not found."
-            if len(auths) > 1 and all_handshakes is False:
-                errmsg += " Retry the attack with '--all-handshakes'.\n"
-            else:
-                errmsg += "\n"
-            raise PyritRuntimeError(errmsg)
+            self.tell("\nPassword was not found.\n")
+            #errmsg = "\nPassword was not found."
+            #if len(auths) > 1 and all_handshakes is False:
+            #    errmsg += " Retry the attack with '--all-handshakes'.\n"
+            #else:
+            #    errmsg += "\n"
+            #raise PyritRuntimeError(errmsg)
     attack_batch.cli_options = (('-r', '-u'), ('-e', '-b', '-o', \
                                                '--all-handshakes'))
 
@@ -1076,12 +1078,13 @@ class Pyrit_CLI(object):
                         writer.write(cracker.solution)
                 break
         else:
-            errmsg = "\nPassword was not found."
-            if len(auths) > 1 and all_handshakes is False:
-                errmsg += " Retry the attack with '--all-handshakes'.\n"
-            else:
-                errmsg += "\n"
-            raise PyritRuntimeError(errmsg)
+            self.tell("\nPassword was not found.\n")
+            #errmsg = "\nPassword was not found."
+            #if len(auths) > 1 and all_handshakes is False:
+            #    errmsg += " Retry the attack with '--all-handshakes'.\n"
+            #else:
+            #    errmsg += "\n"
+            #raise PyritRuntimeError(errmsg)
     attack_db.cli_options = (('-r', '-u'), ('-e', '-b', '-o', \
                                             '--all-handshakes'))
 
@@ -1149,12 +1152,13 @@ class Pyrit_CLI(object):
                             writer.write(cracker.solution)
                     break
             else:
-                errmsg = "\nPassword was not found."
-                if len(auths) > 1 and all_handshakes is False:
-                    errmsg += " Retry the attack with '--all-handshakes'.\n"
-                else:
-                    errmsg += "\n"
-                raise PyritRuntimeError(errmsg)
+                self.tell("\nPassword was not found.\n")
+                #errmsg = "\nPassword was not found."
+                #if len(auths) > 1 and all_handshakes is False:
+                #    errmsg += " Retry the attack with '--all-handshakes'.\n"
+                #else:
+                #    errmsg += "\n"
+                #raise PyritRuntimeError(errmsg)
     attack_cowpatty.cli_options = (('-r', '-i'), ('-e', '-b', '-o', \
                                                   '--all-handshakes'))
 
