@@ -951,7 +951,7 @@ class Pyrit_CLI(object):
                 self.tell("\nThe password is '%s'.\n" % cracker.solution)
                 if outfile is not None:
                     with cpyrit.util.FileWrapper(outfile, 'a') as writer:
-                        writer.write("\nThe password is '%s'.\n" % cracker.solution)
+                        writer.write("{ password: %s }\n" % cracker.solution)
                 break
         else:
             self.tell("\nPassword was not found.\n")
@@ -1021,7 +1021,7 @@ class Pyrit_CLI(object):
                 self.tell("\nThe password is '%s'.\n" % cracker.solution)
                 if outfile is not None:
                     with cpyrit.util.FileWrapper(outfile, 'a') as writer:
-                        writer.write("\nThe password is '%s'.\n" % cracker.solution)
+                        writer.write("{ password: %s }\n" % cracker.solution)
                 break
         else:
             self.tell("\nPassword was not found.\n")
@@ -1091,7 +1091,7 @@ class Pyrit_CLI(object):
                 self.tell("\nThe password is '%s'.\n" % cracker.solution)
                 if outfile is not None:
                     with cpyrit.util.FileWrapper(outfile, 'a') as writer:
-                        writer.write("\nThe password is '%s'.\n" % cracker.solution)
+                        writer.write("{ password: %s }\n" % cracker.solution)
                 break
         else:
             self.tell("\nPassword was not found.\n")
@@ -1173,7 +1173,7 @@ class Pyrit_CLI(object):
                     self.tell("\nThe password is '%s'.\n" % cracker.solution)
                     if outfile is not None:
                         with cpyrit.util.FileWrapper(outfile, 'a') as writer:
-                            writer.write("\nThe password is '%s'.\n" % cracker.solution)
+                            writer.write("{ password: %s }\n" % cracker.solution)
                     break
             else:
                 self.tell("\nPassword was not found.\n")
