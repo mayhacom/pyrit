@@ -933,9 +933,17 @@ class Pyrit_CLI(object):
                     self.tell("Tried %i PMKs so far; %i PMKs per second.\r" % \
                                 (perfcounter.total, perfcounter.avg),
                               end=None, sep=None)
+                    if outfile is not None:
+                        with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                            writer.write("Tried %i PMKs so far; %i PMKs per second.\n" % \
+                                (perfcounter.total, perfcounter.avg))
                     if any(c.solution is not None for c in crackers):
                         break
         self.tell("Tried %i PMKs so far; %i PMKs per second." % \
+                    (perfcounter.total, perfcounter.avg))
+        if outfile is not None:
+            with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                writer.write("Tried %i PMKs so far; %i PMKs per second.\n" % \
                     (perfcounter.total, perfcounter.avg))
         for cracker in crackers:
             cracker.join()
@@ -1002,6 +1010,12 @@ class Pyrit_CLI(object):
                                     100.0 * (idx + 1) / len(storage.passwords),
                                     perfcounter.avg),
                                   end=None, sep=None)
+                        if outfile is not None:
+                            with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                                writer.write("Tried %i PMKs so far (%.1f%%); " \
+                                  "%i PMKs per second.\n" % (perfcounter.total,
+                                    100.0 * (idx + 1) / len(storage.passwords),
+                                    perfcounter.avg))
                         if cracker.solution:
                             break
                     self.tell('')
@@ -1068,6 +1082,12 @@ class Pyrit_CLI(object):
                                 100.0 * (idx + 1) / WUcount,
                                 perfcounter.avg),
                               end=None, sep=None)
+                    if outfile is not None:
+                        with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                            writer.write("Tried %i PMKs so far (%.1f%%); " \
+                              "%i PMKs per second.\n" % (perfcounter.total,
+                                100.0 * (idx + 1) / WUcount,
+                                perfcounter.avg))
                     if cracker.solution is not None:
                         break
                 self.tell('')
@@ -1137,11 +1157,19 @@ class Pyrit_CLI(object):
                 self.tell("Tried %i PMKs so far; %i PMKs per second.\r" % \
                           (perfcounter.total, perfcounter.avg),
                           end=None, sep=None)
+                if outfile is not None:
+                    with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                        writer.write("Tried %i PMKs so far; %i PMKs per second.\n" % \
+                          (perfcounter.total, perfcounter.avg))
                 if any(cracker.solution is not None for cracker in crackers):
                     break
             crackers[0].join()
             perfcounter.addAbsolutePoint(len(crackers[0]))
             self.tell("Tried %i PMKs so far; %i PMKs per second." % \
+                      (perfcounter.total, perfcounter.avg))
+            if outfile is not None:
+                with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                    writer.write("Tried %i PMKs so far; %i PMKs per second.\n" % \
                       (perfcounter.total, perfcounter.avg))
             for cracker in crackers:
                 cracker.join()
