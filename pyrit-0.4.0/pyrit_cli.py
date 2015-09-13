@@ -446,23 +446,42 @@ class Pyrit_CLI(object):
         """
         parser = self._getParser(capturefile)
         with cpyrit.util.FileWrapper(capturefile + ".analyze", 'w') as writer:
+			writer.write("{ \"access_points\" : [ ")
 			for i, ap in enumerate(parser):
 				self.tell("#%i: AccessPoint %s ('%s'):" % (i + 1, ap, ap.essid))
-				writer.write("#%i: AccessPoint %s ('%s'):\n" % (i + 1, ap, ap.essid))
+				writer.write("{")
+				writer.write(" \"bssid\" : \"%s\", \"essid\" : \"%s\", " % (ap, ap.essid))
+				writer.write(" \"stations\" : [ ")
 				for j, sta in enumerate(ap):
 					self.tell("  #%i: Station %s" % (j + 1, sta), \
 							  end=None, sep=None)
-					writer.write("  #%i: Station %s" % (j + 1, sta))
+					writer.write("{")
+					writer.write(" \"mac\" : \"%s\" " % (sta))
 					auths = sta.getAuthentications()
 					if len(auths) > 0:
 						self.tell(", %i handshake(s):" % (len(auths),))
-						writer.write(", %i handshake(s):\n" % (len(auths),))
+						writer.write(", \"handshakes\" : [ ")
 						for k, auth in enumerate(auths):
 							self.tell("    #%i: %s" % (k + 1, auth))
-							writer.write("    #%i: %s\n" % (k + 1, auth))
+							writer.write("{ \"auth\" : \"%s\" }" % (auth))
+							if len(auths) - 1 > k:
+								writer.write(", ")
+							else:
+								writer.write(" ")
+						writer.write("] ")
 					else:
 						self.tell("")
-						writer.write("\n")
+					writer.write("}")
+					if len(ap) - 1 > j:
+						writer.write(", ")
+					else:
+						writer.write(" ")
+				writer.write("] } ")
+				if len(parser) - 1 > i:
+					writer.write(", ")
+				else:
+					writer.write(" ")
+			writer.write("] }")
         if not any(ap.isCompleted() and ap.essid is not None for ap in parser):
             raise PyritRuntimeError("No valid EAOPL-handshake + ESSID " \
                                     "detected.")
