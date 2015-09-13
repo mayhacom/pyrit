@@ -445,7 +445,7 @@ class Pyrit_CLI(object):
            pyrit -r "test*.pcap" analyze
         """
         parser = self._getParser(capturefile)
-        with cpyrit.util.FileWrapper(capturefile + ".analyze", 'a') as writer:
+        with cpyrit.util.FileWrapper(capturefile + ".analyze", 'w') as writer:
 			for i, ap in enumerate(parser):
 				self.tell("#%i: AccessPoint %s ('%s'):" % (i + 1, ap, ap.essid))
 				writer.write("#%i: AccessPoint %s ('%s'):\n" % (i + 1, ap, ap.essid))
