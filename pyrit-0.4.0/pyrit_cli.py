@@ -446,7 +446,9 @@ class Pyrit_CLI(object):
         """
         parser = self._getParser(capturefile)
         with cpyrit.util.FileWrapper(capturefile + ".analyze", 'w') as writer:
-			writer.write("{ \"access_points\" : [ ")
+			writer.write("{ \"packets\" : \"%i\", \"dot11_packets\" : \"%i\", " % \
+				(parser.pcktcount, parser.dot11_pcktcount))
+			writer.write(" \"access_points\" : [ ")
 			for i, ap in enumerate(parser):
 				self.tell("#%i: AccessPoint %s ('%s'):" % (i + 1, ap, ap.essid))
 				writer.write("{")
