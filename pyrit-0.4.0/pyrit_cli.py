@@ -445,18 +445,45 @@ class Pyrit_CLI(object):
            pyrit -r "test*.pcap" analyze
         """
         parser = self._getParser(capturefile)
-        for i, ap in enumerate(parser):
-            self.tell("#%i: AccessPoint %s ('%s'):" % (i + 1, ap, ap.essid))
-            for j, sta in enumerate(ap):
-                self.tell("  #%i: Station %s" % (j + 1, sta), \
-                          end=None, sep=None)
-                auths = sta.getAuthentications()
-                if len(auths) > 0:
-                    self.tell(", %i handshake(s):" % (len(auths),))
-                    for k, auth in enumerate(auths):
-                        self.tell("    #%i: %s" % (k + 1, auth))
-                else:
-                    self.tell("")
+        with cpyrit.util.FileWrapper(capturefile + ".json", 'w') as writer:
+			writer.write("{ \"packets\" : \"%i\", \"dot11_packets\" : \"%i\", " % \
+				(parser.pcktcount, parser.dot11_pcktcount))
+			writer.write(" \"access_points\" : [ ")
+			for i, ap in enumerate(parser):
+				self.tell("#%i: AccessPoint %s ('%s'):" % (i + 1, ap, ap.essid))
+				writer.write("{")
+				writer.write(" \"bssid\" : \"%s\", \"essid\" : \"%s\", " % (ap, ap.essid))
+				writer.write(" \"stations\" : [ ")
+				for j, sta in enumerate(ap):
+					self.tell("  #%i: Station %s" % (j + 1, sta), \
+							  end=None, sep=None)
+					writer.write("{")
+					writer.write(" \"mac\" : \"%s\" " % (sta))
+					auths = sta.getAuthentications()
+					if len(auths) > 0:
+						self.tell(", %i handshake(s):" % (len(auths),))
+						writer.write(", \"handshakes\" : [ ")
+						for k, auth in enumerate(auths):
+							self.tell("    #%i: %s" % (k + 1, auth))
+							writer.write("{ \"auth\" : \"%s\" }" % (auth))
+							if len(auths) - 1 > k:
+								writer.write(", ")
+							else:
+								writer.write(" ")
+						writer.write("] ")
+					else:
+						self.tell("")
+					writer.write("}")
+					if len(ap) - 1 > j:
+						writer.write(", ")
+					else:
+						writer.write(" ")
+				writer.write("] } ")
+				if len(parser) - 1 > i:
+					writer.write(", ")
+				else:
+					writer.write(" ")
+			writer.write("] }")
         if not any(ap.isCompleted() and ap.essid is not None for ap in parser):
             raise PyritRuntimeError("No valid EAOPL-handshake + ESSID " \
                                     "detected.")
@@ -933,17 +960,25 @@ class Pyrit_CLI(object):
                     self.tell("Tried %i PMKs so far; %i PMKs per second.\r" % \
                                 (perfcounter.total, perfcounter.avg),
                               end=None, sep=None)
+                    if outfile is not None:
+                        with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                            writer.write("{ total: %i, avg: %i }\n" % \
+                                (perfcounter.total, perfcounter.avg))
                     if any(c.solution is not None for c in crackers):
                         break
         self.tell("Tried %i PMKs so far; %i PMKs per second." % \
+                    (perfcounter.total, perfcounter.avg))
+        if outfile is not None:
+            with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                writer.write("{ total: %i, avg: %i }\n" % \
                     (perfcounter.total, perfcounter.avg))
         for cracker in crackers:
             cracker.join()
             if cracker.solution is not None:
                 self.tell("\nThe password is '%s'.\n" % cracker.solution)
                 if outfile is not None:
-                    with cpyrit.util.FileWrapper(outfile, 'w') as writer:
-                        writer.write(cracker.solution)
+                    with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                        writer.write("{ password: %s }\n" % cracker.solution)
                 break
         else:
             self.tell("\nPassword was not found.\n")
@@ -1002,14 +1037,18 @@ class Pyrit_CLI(object):
                                     100.0 * (idx + 1) / len(storage.passwords),
                                     perfcounter.avg),
                                   end=None, sep=None)
+                        if outfile is not None:
+                            with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                                writer.write("{ total: %i, avg: %i }\n" % \
+                                    (perfcounter.total, perfcounter.avg))
                         if cracker.solution:
                             break
                     self.tell('')
             if cracker.solution is not None:
                 self.tell("\nThe password is '%s'.\n" % cracker.solution)
                 if outfile is not None:
-                    with cpyrit.util.FileWrapper(outfile, 'w') as writer:
-                        writer.write(cracker.solution)
+                    with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                        writer.write("{ password: %s }\n" % cracker.solution)
                 break
         else:
             self.tell("\nPassword was not found.\n")
@@ -1068,14 +1107,18 @@ class Pyrit_CLI(object):
                                 100.0 * (idx + 1) / WUcount,
                                 perfcounter.avg),
                               end=None, sep=None)
+                    if outfile is not None:
+                        with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                            writer.write("{ total: %i, avg: %i }\n" % \
+                                (perfcounter.total, perfcounter.avg))
                     if cracker.solution is not None:
                         break
                 self.tell('')
             if cracker.solution is not None:
                 self.tell("\nThe password is '%s'.\n" % cracker.solution)
                 if outfile is not None:
-                    with cpyrit.util.FileWrapper(outfile, 'w') as writer:
-                        writer.write(cracker.solution)
+                    with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                        writer.write("{ password: %s }\n" % cracker.solution)
                 break
         else:
             self.tell("\nPassword was not found.\n")
@@ -1137,19 +1180,27 @@ class Pyrit_CLI(object):
                 self.tell("Tried %i PMKs so far; %i PMKs per second.\r" % \
                           (perfcounter.total, perfcounter.avg),
                           end=None, sep=None)
+                if outfile is not None:
+                    with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                        writer.write("{ total: %i, avg: %i }\n" % \
+                          (perfcounter.total, perfcounter.avg))
                 if any(cracker.solution is not None for cracker in crackers):
                     break
             crackers[0].join()
             perfcounter.addAbsolutePoint(len(crackers[0]))
             self.tell("Tried %i PMKs so far; %i PMKs per second." % \
                       (perfcounter.total, perfcounter.avg))
+            if outfile is not None:
+                with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                    writer.write("{ total: %i, avg: %i }\n" % \
+                      (perfcounter.total, perfcounter.avg))
             for cracker in crackers:
                 cracker.join()
                 if cracker.solution is not None:
                     self.tell("\nThe password is '%s'.\n" % cracker.solution)
                     if outfile is not None:
-                        with cpyrit.util.FileWrapper(outfile, 'w') as writer:
-                            writer.write(cracker.solution)
+                        with cpyrit.util.FileWrapper(outfile, 'a') as writer:
+                            writer.write("{ password: %s }\n" % cracker.solution)
                     break
             else:
                 self.tell("\nPassword was not found.\n")
