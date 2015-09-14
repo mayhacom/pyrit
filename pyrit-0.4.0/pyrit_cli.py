@@ -445,7 +445,7 @@ class Pyrit_CLI(object):
            pyrit -r "test*.pcap" analyze
         """
         parser = self._getParser(capturefile)
-        with cpyrit.util.FileWrapper(capturefile + ".analyze", 'w') as writer:
+        with cpyrit.util.FileWrapper(capturefile + ".json", 'w') as writer:
 			writer.write("{ \"packets\" : \"%i\", \"dot11_packets\" : \"%i\", " % \
 				(parser.pcktcount, parser.dot11_pcktcount))
 			writer.write(" \"access_points\" : [ ")
